@@ -1,0 +1,6 @@
+from typing import Protocol
+
+
+class DataProvider(Protocol):
+    def get_quote(self, symbol: str) -> dict: ...
+    def get_history(self, symbol: str, period: str) -> list[dict]: ...

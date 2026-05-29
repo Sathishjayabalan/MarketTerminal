@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: bloomberg-terminal
+    runtime: python
+    rootDir: bloomberg
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DB_PATH
+        value: /data/bloomberg.db
+    disk:
+      name: bloomberg-data
+      mountPath: /data
+      sizeGB: 1
