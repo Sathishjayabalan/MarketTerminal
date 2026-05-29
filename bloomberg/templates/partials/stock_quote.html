@@ -1,0 +1,125 @@
+{% if quote.error %}
+<div style="color: var(--red); padding: 10px;">ERROR: {{ quote.error }}</div>
+{% else %}
+<div style="margin-bottom: 10px;">
+    <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px;">
+        <span style="color: var(--amber); font-size: 18px; font-weight: bold; letter-spacing: 2px;">{{ quote.symbol }}</span>
+        <span class="price-big">{{ "{:,.2f}".format(quote.price) }}</span>
+        <span class="{{ 'up' if quote.change >= 0 else 'down' }}" style="font-size: 16px;">
+            {{ "+" if quote.change >= 0 else "" }}{{ "{:.2f}".format(quote.change) }}
+            ({{ "+" if quote.change_pct >= 0 else "" }}{{ "{:.2f}".format(quote.change_pct) }}%)
+        </span>
+    </div>
+    <div class="quote-grid">
+        <div class="quote-item">
+            <label>VOLUME (3M AVG)</label>
+            <value>{{ "{:,}".format(quote.volume) }}</value>
+        </div>
+        <div class="quote-item">
+            <label>MARKET CAP</label>
+            <value>
+                {% if quote.market_cap >= 1_000_000_000_000 %}
+                    {{ "{:.2f}T".format(quote.market_cap / 1_000_000_000_000) }}
+                {% elif quote.market_cap >= 1_000_000_000 %}
+                    {{ "{:.2f}B".format(quote.market_cap / 1_000_000_000) }}
+                {% elif quote.market_cap > 0 %}
+                    {{ "{:.2f}M".format(quote.market_cap / 1_000_000) }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </value>
+        </div>
+        <div class="quote-item">
+            <label>52W HIGH</label>
+            <value class="up">{{ "{:,.2f}".format(quote.fifty_two_week_high) }}</value>
+        </div>
+        <div class="quote-item">
+            <label>52W LOW</label>
+            <value class="down">{{ "{:,.2f}".format(quote.fifty_two_week_low) }}</value>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Price Chart -->
+<div class="chart-container" id="price-chart-{{ quote.symbol | replace('^','X') | replace('-','_') }}"></div>
+
+<script>
+(function() {
+    var containerId = 'price-chart-{{ quote.symbol | replace("^","X") | replace("-","_") }}';
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Remove any existing chart
+    container.innerHTML = '';
+
+    var historyData = {{ history_json | safe }};
+
+    if (!historyData || historyData.length === 0) {
+        container.innerHTML = '<div style="color: var(--dim); text-align: center; padding: 20px;">NO CHART DATA AVAILABLE</div>';
+        return;
+    }
+
+    var chart = LightweightCharts.createChart(container, {
+        width: container.clientWidth || 400,
+        height: 180,
+        layout: {
+            background: { color: '#0d1117' },
+            textColor: '#c9d1d9',
+        },
+        grid: {
+            vertLines: { color: '#1e3a1e' },
+            horzLines: { color: '#1e3a1e' },
+        },
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+            borderColor: '#1e3a1e',
+        },
+        timeScale: {
+            borderColor: '#1e3a1e',
+            timeVisible: true,
+            secondsVisible: false,
+        },
+    });
+
+    var isUp = historyData.length > 1
+        ? historyData[historyData.length - 1].value >= historyData[0].value
+        : true;
+
+    var lineColor = isUp ? '#00ff41' : '#ff4444';
+    var topColor = isUp ? 'rgba(0,255,65,0.3)' : 'rgba(255,68,68,0.3)';
+    var bottomColor = isUp ? 'rgba(0,255,65,0.0)' : 'rgba(255,68,68,0.0)';
+
+    var areaSeries = chart.addAreaSeries({
+        lineColor: lineColor,
+        topColor: topColor,
+        bottomColor: bottomColor,
+        lineWidth: 2,
+    });
+
+    areaSeries.setData(historyData);
+    chart.timeScale().fitContent();
+
+    // Resize observer
+    var resizeObserver = new ResizeObserver(function(entries) {
+        for (var entry of entries) {
+            chart.applyOptions({ width: entry.contentRect.width });
+        }
+    });
+    resizeObserver.observe(container);
+})();
+</script>
+
+{% if news %}
+<div style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px;">
+    <div style="color: var(--amber); font-size: 10px; letter-spacing: 2px; margin-bottom: 6px;">RELATED NEWS</div>
+    {% for item in news %}
+    <div class="news-item">
+        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+        <div class="news-source">{{ item.source }} &bull; {{ item.published[:10] if item.published else "" }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="terminal-grid">
+
+    <!-- LEFT COLUMN: Market Overview + Watchlist -->
+    <div class="terminal-col">
+
+        <!-- Market Overview Panel -->
+        <div class="panel" style="flex: 0 0 auto;">
+            <div class="panel-header">
+                <span class="panel-title">&#9670; MARKET OVERVIEW</span>
+                <span class="htmx-indicator timestamp">LOADING...</span>
+            </div>
+            <div class="panel-body"
+                 hx-get="/market/overview"
+                 hx-trigger="load, every 30s"
+                 hx-target="this"
+                 hx-swap="innerHTML"
+                 hx-indicator=".htmx-indicator">
+                <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING MARKET DATA...</div>
+            </div>
+        </div>
+
+        <!-- Watchlist Panel -->
+        <div class="panel" style="flex: 1;">
+            <div class="panel-header">
+                <span class="panel-title">&#9670; WATCHLIST</span>
+                <span class="htmx-indicator timestamp">LOADING...</span>
+            </div>
+            <div class="panel-body"
+                 id="watchlist-panel"
+                 hx-get="/watchlist"
+                 hx-trigger="load, every 30s"
+                 hx-target="this"
+                 hx-swap="innerHTML"
+                 hx-indicator=".htmx-indicator">
+                <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING WATCHLIST...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CENTER COLUMN: Stock Quote + News -->
+    <div class="terminal-col">
+
+        <!-- Stock Quote Panel -->
+        <div class="panel" style="flex: 1;">
+            <div class="panel-header">
+                <span class="panel-title">&#9670; EQUITY QUOTE</span>
+                <span class="htmx-indicator timestamp">LOADING...</span>
+            </div>
+            <div class="panel-body" style="overflow-y: auto;">
+                <div class="search-bar">
+                    <input type="text"
+                           id="symbol-input"
+                           name="symbol"
+                           placeholder="ENTER SYMBOL (e.g. AAPL)"
+                           value="AAPL"
+                           style="text-transform: uppercase;"
+                           hx-get="/stocks/quote"
+                           hx-trigger="keyup[keyCode==13]"
+                           hx-target="#stock-panel"
+                           hx-swap="innerHTML"
+                           hx-include="#symbol-input"
+                           hx-indicator=".htmx-indicator">
+                    <button hx-get="/stocks/quote"
+                            hx-target="#stock-panel"
+                            hx-swap="innerHTML"
+                            hx-include="#symbol-input"
+                            hx-indicator=".htmx-indicator">GO</button>
+                </div>
+                <div id="stock-panel"
+                     hx-get="/stocks/quote?symbol=AAPL"
+                     hx-trigger="load"
+                     hx-swap="innerHTML"
+                     hx-indicator=".htmx-indicator">
+                    <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING QUOTE...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Panel -->
+        <div class="panel" style="flex: 0 0 240px;">
+            <div class="panel-header">
+                <span class="panel-title">&#9670; MARKET NEWS</span>
+                <span class="htmx-indicator timestamp">LOADING...</span>
+            </div>
+            <div class="panel-body"
+                 hx-get="/news/feed"
+                 hx-trigger="load, every 300s"
+                 hx-target="this"
+                 hx-swap="innerHTML"
+                 hx-indicator=".htmx-indicator">
+                <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING NEWS...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Forex + Portfolio -->
+    <div class="terminal-col">
+
+        <!-- Forex Panel -->
+        <div class="panel" style="flex: 0 0 auto;">
+            <div class="panel-header">
+                <span class="panel-title">&#9670; FOREX / FX RATES</span>
+                <span class="htmx-indicator timestamp">LOADING...</span>
+            </div>
+            <div class="panel-body"
+                 hx-get="/forex/rates"
+                 hx-trigger="load, every 30s"
+                 hx-target="this"
+                 hx-swap="innerHTML"
+                 hx-indicator=".htmx-indicator">
+                <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING FX RATES...</div>
+            </div>
+        </div>
+
+        <!-- Portfolio Panel -->
+        <div class="panel" style="flex: 1;">
+            <div class="panel-header">
+                <span class="panel-title">&#9670; PORTFOLIO</span>
+                <span class="htmx-indicator timestamp">LOADING...</span>
+            </div>
+            <div class="panel-body"
+                 id="portfolio-panel"
+                 hx-get="/portfolio"
+                 hx-trigger="load, every 30s"
+                 hx-target="this"
+                 hx-swap="innerHTML"
+                 hx-indicator=".htmx-indicator">
+                <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING PORTFOLIO...</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
