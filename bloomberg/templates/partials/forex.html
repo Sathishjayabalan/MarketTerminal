@@ -1,0 +1,31 @@
+<table>
+    <thead>
+        <tr>
+            <th style="text-align:left;">PAIR</th>
+            <th>RATE</th>
+            <th>STATUS</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in rates %}
+        <tr>
+            <td style="text-align:left; color: var(--amber); font-weight: bold;">{{ r.pair }}</td>
+            <td>
+                {% if r.error %}
+                <span class="down">ERR</span>
+                {% else %}
+                {{ "{:,.4f}".format(r.rate) if r.pair != "BTC/USD" else "{:,.2f}".format(r.rate) }}
+                {% endif %}
+            </td>
+            <td>
+                {% if r.error %}
+                <span class="down" style="font-size:9px;">{{ r.error[:20] }}</span>
+                {% else %}
+                <span class="up" style="font-size:9px;">LIVE</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="timestamp" style="text-align: right; margin-top: 4px;">UPDATED {{ updated_at }} &bull; SOURCE: FRANKFURTER.APP</div>
