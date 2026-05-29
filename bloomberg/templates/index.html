@@ -9,14 +9,14 @@
         <div class="panel" style="flex: 0 0 auto;">
             <div class="panel-header">
                 <span class="panel-title">&#9670; MARKET OVERVIEW</span>
-                <span class="htmx-indicator timestamp">LOADING...</span>
+                <span id="ind-market" class="htmx-indicator timestamp">LOADING...</span>
             </div>
             <div class="panel-body"
                  hx-get="/market/overview"
                  hx-trigger="load, every 30s"
                  hx-target="this"
                  hx-swap="innerHTML"
-                 hx-indicator=".htmx-indicator">
+                 hx-indicator="#ind-market">
                 <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING MARKET DATA...</div>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <div class="panel" style="flex: 1;">
             <div class="panel-header">
                 <span class="panel-title">&#9670; WATCHLIST</span>
-                <span class="htmx-indicator timestamp">LOADING...</span>
+                <span id="ind-watchlist" class="htmx-indicator timestamp">LOADING...</span>
             </div>
             <div class="panel-body"
                  id="watchlist-panel"
@@ -33,7 +33,7 @@
                  hx-trigger="load, every 30s"
                  hx-target="this"
                  hx-swap="innerHTML"
-                 hx-indicator=".htmx-indicator">
+                 hx-indicator="#ind-watchlist">
                 <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING WATCHLIST...</div>
             </div>
         </div>
@@ -47,7 +47,7 @@
         <div class="panel" style="flex: 1;">
             <div class="panel-header">
                 <span class="panel-title">&#9670; EQUITY QUOTE</span>
-                <span class="htmx-indicator timestamp">LOADING...</span>
+                <span id="ind-stock" class="htmx-indicator timestamp">LOADING...</span>
             </div>
             <div class="panel-body" style="overflow-y: auto;">
                 <div class="search-bar">
@@ -62,18 +62,18 @@
                            hx-target="#stock-panel"
                            hx-swap="innerHTML"
                            hx-include="#symbol-input"
-                           hx-indicator=".htmx-indicator">
+                           hx-indicator="#ind-stock">
                     <button hx-get="/stocks/quote"
                             hx-target="#stock-panel"
                             hx-swap="innerHTML"
                             hx-include="#symbol-input"
-                            hx-indicator=".htmx-indicator">GO</button>
+                            hx-indicator="#ind-stock">GO</button>
                 </div>
                 <div id="stock-panel"
                      hx-get="/stocks/quote?symbol=AAPL"
                      hx-trigger="load"
                      hx-swap="innerHTML"
-                     hx-indicator=".htmx-indicator">
+                     hx-indicator="#ind-stock">
                     <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING QUOTE...</div>
                 </div>
             </div>
@@ -83,14 +83,14 @@
         <div class="panel" style="flex: 0 0 240px;">
             <div class="panel-header">
                 <span class="panel-title">&#9670; MARKET NEWS</span>
-                <span class="htmx-indicator timestamp">LOADING...</span>
+                <span id="ind-news" class="htmx-indicator timestamp">LOADING...</span>
             </div>
             <div class="panel-body"
                  hx-get="/news/feed"
                  hx-trigger="load, every 300s"
                  hx-target="this"
                  hx-swap="innerHTML"
-                 hx-indicator=".htmx-indicator">
+                 hx-indicator="#ind-news">
                 <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING NEWS...</div>
             </div>
         </div>
@@ -104,14 +104,14 @@
         <div class="panel" style="flex: 0 0 auto;">
             <div class="panel-header">
                 <span class="panel-title">&#9670; FOREX / FX RATES</span>
-                <span class="htmx-indicator timestamp">LOADING...</span>
+                <span id="ind-forex" class="htmx-indicator timestamp">LOADING...</span>
             </div>
             <div class="panel-body"
                  hx-get="/forex/rates"
                  hx-trigger="load, every 30s"
                  hx-target="this"
                  hx-swap="innerHTML"
-                 hx-indicator=".htmx-indicator">
+                 hx-indicator="#ind-forex">
                 <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING FX RATES...</div>
             </div>
         </div>
@@ -120,7 +120,7 @@
         <div class="panel" style="flex: 1;">
             <div class="panel-header">
                 <span class="panel-title">&#9670; PORTFOLIO</span>
-                <span class="htmx-indicator timestamp">LOADING...</span>
+                <span id="ind-portfolio" class="htmx-indicator timestamp">LOADING...</span>
             </div>
             <div class="panel-body"
                  id="portfolio-panel"
@@ -128,7 +128,7 @@
                  hx-trigger="load, every 30s"
                  hx-target="this"
                  hx-swap="innerHTML"
-                 hx-indicator=".htmx-indicator">
+                 hx-indicator="#ind-portfolio">
                 <div style="color: var(--dim); padding: 20px; text-align: center;">FETCHING PORTFOLIO...</div>
             </div>
         </div>

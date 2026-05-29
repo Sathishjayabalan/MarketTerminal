@@ -11,6 +11,8 @@ def get_quote(symbol: str) -> dict:
     with _lock:
         if symbol in _quote_cache:
             return _quote_cache[symbol]
+    # Fetch outside lock to avoid blocking other cache hits during slow I/O.
+    # Duplicate concurrent fetches for the same symbol are benign (last writer wins).
     try:
         ticker = yf.Ticker(symbol)
         info = ticker.fast_info
