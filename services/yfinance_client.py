@@ -12,16 +12,28 @@ def get_quote(symbol: str) -> dict:
             return _quote_cache[symbol]
     try:
         ticker = yf.Ticker(symbol)
-        info = ticker.fast_info
-        hist = ticker.history(period="2d", interval="1d")
-        price = float(info.last_price) if info.last_price else 0.0
+        hist = ticker.history(period="5d", interval="1d")
+        if hist.empty:
+            raise ValueError("No price data returned")
+        price = float(hist["Close"].iloc[-1])
         prev_close = float(hist["Close"].iloc[-2]) if len(hist) >= 2 else price
         change = price - prev_close
         change_pct = (change / prev_close * 100) if prev_close else 0.0
-        result = {"symbol": symbol, "price": round(price,2), "change": round(change,2),
-            "change_pct": round(change_pct,2), "volume": int(info.three_month_average_volume or 0),
-            "market_cap": int(info.market_cap or 0), "fifty_two_week_high": round(float(info.year_high or 0),2),
-            "fifty_two_week_low": round(float(info.year_low or 0),2), "error": None}
+        try:
+            info = ticker.fast_info
+            market_cap = int(info.market_cap or 0)
+            year_high = round(float(info.year_high or 0), 2)
+            year_low = round(float(info.year_low or 0), 2)
+            volume = int(info.three_month_average_volume or 0)
+        except Exception:
+            market_cap = 0
+            year_high = round(float(hist["High"].max()), 2)
+            year_low = round(float(hist["Low"].min()), 2)
+            volume = int(hist["Volume"].iloc[-1]) if "Volume" in hist.columns else 0
+        result = {"symbol": symbol, "price": round(price, 2), "change": round(change, 2),
+            "change_pct": round(change_pct, 2), "volume": volume,
+            "market_cap": market_cap, "fifty_two_week_high": year_high,
+            "fifty_two_week_low": year_low, "error": None}
     except Exception as e:
         result = {"symbol": symbol, "price": 0, "change": 0, "change_pct": 0, "volume": 0,
             "market_cap": 0, "fifty_two_week_high": 0, "fifty_two_week_low": 0, "error": str(e)}
@@ -37,7 +49,7 @@ def get_history(symbol: str, period: str = "1d", interval: str = "5m") -> list[d
     try:
         ticker = yf.Ticker(symbol)
         hist = ticker.history(period=period, interval=interval)
-        result = [{"time": int(idx.timestamp()), "value": round(float(row["Close"]),2)}
+        result = [{"time": int(idx.timestamp()), "value": round(float(row["Close"]), 2)}
             for idx, row in hist.iterrows()]
     except Exception:
         result = []
@@ -52,10 +64,10 @@ def get_news(symbol: str = "") -> list[dict]:
         result = []
         for item in news[:10]:
             content = item.get("content", {})
-            result.append({"title": content.get("title", item.get("title","No title")),
-                "url": content.get("canonicalUrl",{}).get("url","#"),
-                "source": content.get("provider",{}).get("displayName","Unknown"),
-                "published": content.get("pubDate","")})
+            result.append({"title": content.get("title", item.get("title", "No title")),
+                "url": content.get("canonicalUrl", {}).get("url", "#"),
+                "source": content.get("provider", {}).get("displayName", "Unknown"),
+                "published": content.get("pubDate", "")})
         return result
     except Exception:
         return []
