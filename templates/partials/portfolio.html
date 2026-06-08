@@ -1,0 +1,18 @@
+{% if positions %}
+<table><thead><tr><th style="text-align:left;">SYMBOL</th><th>SHARES</th><th>AVG COST</th><th>PRICE</th><th>VALUE</th><th>P&L</th><th>P&L%</th><th></th></tr></thead><tbody>
+{% for pos in positions %}<tr>
+<td style="text-align:left;color:var(--amber);font-weight:bold;">{{ pos.symbol }}</td>
+<td>{{ "{:.2f}".format(pos.shares) }}</td><td>{{ "{:,.2f}".format(pos.avg_cost) }}</td>
+<td>{{ "{:,.2f}".format(pos.current_price) }}</td><td>{{ "{:,.2f}".format(pos.current_value) }}</td>
+<td class="{{ 'up' if pos.pnl >= 0 else 'down' }}">{{ "+" if pos.pnl >= 0 else "" }}{{ "{:,.2f}".format(pos.pnl) }}</td>
+<td class="{{ 'up' if pos.pnl_pct >= 0 else 'down' }}">{{ "+" if pos.pnl_pct >= 0 else "" }}{{ "{:.2f}".format(pos.pnl_pct) }}%</td>
+<td><form style="margin:0;display:inline;" hx-post="/portfolio/remove" hx-target="#portfolio-panel" hx-swap="innerHTML"><input type="hidden" name="position_id" value="{{ pos.id }}"><button type="submit" class="btn-remove" style="padding:2px 5px;font-size:9px;">X</button></form></td>
+</tr>{% endfor %}
+<tr class="total-row"><td colspan="4">TOTAL PORTFOLIO</td><td>{{ "{:,.2f}".format(total_value) }}</td><td class="{{ 'up' if total_pnl >= 0 else 'down' }}" colspan="2">{{ "+" if total_pnl >= 0 else "" }}{{ "{:,.2f}".format(total_pnl) }}</td><td></td></tr>
+</tbody></table>
+{% else %}<div style="color:var(--dim);padding:10px;text-align:center;font-size:10px;">NO POSITIONS — ADD BELOW</div>{% endif %}
+<form class="add-form" hx-post="/portfolio/add" hx-target="#portfolio-panel" hx-swap="innerHTML">
+<div class="form-group"><label>SYMBOL</label><input type="text" name="symbol" placeholder="AAPL" required style="text-transform:uppercase;"></div>
+<div class="form-group"><label>SHARES</label><input type="number" name="shares" placeholder="10" step="0.01" min="0.01" required></div>
+<div class="form-group"><label>AVG COST</label><input type="number" name="avg_cost" placeholder="150.00" step="0.01" min="0.01" required></div>
+<button type="submit" style="margin-top:14px;white-space:nowrap;">ADD POS</button></form>

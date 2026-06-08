@@ -1,0 +1,6 @@
+{% if news %}{% for item in news %}
+<div class="news-item"><a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+<div class="news-source"><span style="color:var(--amber);">{{ item.source }}</span>{% if item.published %} &bull; {{ item.published[:10] }}{% endif %}</div></div>
+{% endfor %}{% else %}
+<div style="color:var(--dim);padding:20px;text-align:center;">NO NEWS AVAILABLE</div>
+{% endif %}

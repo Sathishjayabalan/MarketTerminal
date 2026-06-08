@@ -1,0 +1,9 @@
+<table><thead><tr><th style="text-align:left;">INDEX</th><th>PRICE</th><th>CHG</th><th>CHG%</th></tr></thead><tbody>
+{% for q in quotes %}<tr>
+<td style="text-align:left;"><span style="color:var(--amber);">{{ q.name }}</span></td>
+<td>{{ "{:,.2f}".format(q.price) }}</td>
+<td class="{{ 'up' if q.change >= 0 else 'down' }}">{{ "+" if q.change >= 0 else "" }}{{ "{:.2f}".format(q.change) }}</td>
+<td class="{{ 'up' if q.change_pct >= 0 else 'down' }}">{{ "+" if q.change_pct >= 0 else "" }}{{ "{:.2f}".format(q.change_pct) }}%</td>
+</tr>{% endfor %}
+</tbody></table>
+<div class="timestamp" style="text-align:right;margin-top:4px;">UPDATED {{ updated_at }}</div>
