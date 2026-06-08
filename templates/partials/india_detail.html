@@ -1,4 +1,4 @@
-{% if quote.error %}
+{% if quote.error and quote.price == 0 %}
 <div style="color:var(--red);padding:10px;">ERROR: {{ quote.error }}</div>
 {% else %}
 <div style="margin-bottom:8px;">
@@ -11,33 +11,12 @@
         </span>
     </div>
     <div class="quote-grid">
-        <div class="quote-item"><label>52W HIGH</label><value class="up">{{ "{:,.2f}".format(quote.fifty_two_week_high) }}</value></div>
-        <div class="quote-item"><label>52W LOW</label><value class="down">{{ "{:,.2f}".format(quote.fifty_two_week_low) }}</value></div>
+        <div class="quote-item"><label>52W HIGH</label><value class="up">{{ "{:,.2f}".format(quote.year_high) }}</value></div>
+        <div class="quote-item"><label>52W LOW</label><value class="down">{{ "{:,.2f}".format(quote.year_low) }}</value></div>
     </div>
 </div>
 {% endif %}
-<div class="chart-container" id="india-chart-{{ quote.symbol|replace('^','X')|replace('-','_') }}"></div>
-<script>
-(function(){
-    var id='india-chart-{{ quote.symbol|replace("^","X")|replace("-","_") }}';
-    var c=document.getElementById(id); if(!c) return;
-    c.innerHTML='';
-    var data={{ history_json|safe }};
-    if(!data||!data.length){c.innerHTML='<div style="color:var(--dim);text-align:center;padding:20px;">NO CHART DATA</div>';return;}
-    var chart=LightweightCharts.createChart(c,{width:c.clientWidth||400,height:150,
-        layout:{background:{color:'#0d1117'},textColor:'#c9d1d9'},
-        grid:{vertLines:{color:'#1e3a1e'},horzLines:{color:'#1e3a1e'}},
-        crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
-        rightPriceScale:{borderColor:'#1e3a1e'},
-        timeScale:{borderColor:'#1e3a1e',timeVisible:true,secondsVisible:false}});
-    var up=data.length>1?data[data.length-1].value>=data[0].value:true;
-    chart.addAreaSeries({lineColor:up?'#00ff41':'#ff4444',
-        topColor:up?'rgba(0,255,65,0.3)':'rgba(255,68,68,0.3)',
-        bottomColor:'rgba(0,0,0,0)',lineWidth:2}).setData(data);
-    chart.timeScale().fitContent();
-    new ResizeObserver(function(e){chart.applyOptions({width:e[0].contentRect.width});}).observe(c);
-})();
-</script>
+
 <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
     <div style="color:var(--amber);font-size:10px;letter-spacing:2px;margin-bottom:6px;">KEY INFLUENCING FACTORS</div>
     <table>
@@ -70,4 +49,4 @@
         &#x25B2; US YIELD UP = FII shift to bonds = Capital outflow = Bearish
     </div>
 </div>
-<div class="timestamp" style="text-align:right;margin-top:4px;">UPDATED {{ updated_at }}</div>
+<div class="timestamp" style="text-align:right;margin-top:4px;">UPDATED {{ updated_at }} &bull; SOURCE: NSE INDIA</div>
