@@ -1,42 +1,75 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="terminal-grid">
+<div style="background:#000;border-bottom:1px solid var(--border);padding:4px 8px;display:flex;gap:12px;">
+    <span id="tab-global" style="color:var(--amber);font-size:10px;letter-spacing:2px;cursor:pointer;padding:2px 8px;border-bottom:2px solid var(--amber);" onclick="showTab('global')">GLOBAL MARKETS</span>
+    <span id="tab-india" style="color:var(--dim);font-size:10px;letter-spacing:2px;cursor:pointer;padding:2px 8px;" onclick="showTab('india')">INDIA MARKETS</span>
+</div>
+
+<div id="view-global" class="terminal-grid">
     <div class="terminal-col">
-        <div class="panel" style="flex: 0 0 auto;">
+        <div class="panel" style="flex:0 0 auto;">
             <div class="panel-header"><span class="panel-title">&#9670; MARKET OVERVIEW</span><span id="ind-market" class="htmx-indicator timestamp">LOADING...</span></div>
             <div class="panel-body" hx-get="/market/overview" hx-trigger="load, every 30s" hx-target="this" hx-swap="innerHTML" hx-indicator="#ind-market"></div>
         </div>
-        <div class="panel" style="flex: 1;">
+        <div class="panel" style="flex:1;">
             <div class="panel-header"><span class="panel-title">&#9670; WATCHLIST</span><span id="ind-watchlist" class="htmx-indicator timestamp">LOADING...</span></div>
             <div class="panel-body" id="watchlist-panel" hx-get="/watchlist" hx-trigger="load, every 30s" hx-target="this" hx-swap="innerHTML" hx-indicator="#ind-watchlist"></div>
         </div>
     </div>
     <div class="terminal-col">
-        <div class="panel" style="flex: 1;">
+        <div class="panel" style="flex:1;">
             <div class="panel-header"><span class="panel-title">&#9670; EQUITY QUOTE</span><span id="ind-stock" class="htmx-indicator timestamp">LOADING...</span></div>
-            <div class="panel-body" style="overflow-y: auto;">
+            <div class="panel-body" style="overflow-y:auto;">
                 <div class="search-bar">
-                    <input type="text" id="symbol-input" name="symbol" placeholder="ENTER SYMBOL (e.g. AAPL)" value="AAPL" style="text-transform: uppercase;"
+                    <input type="text" id="symbol-input" name="symbol" placeholder="ENTER SYMBOL (e.g. AAPL)" value="AAPL" style="text-transform:uppercase;"
                            hx-get="/stocks/quote" hx-trigger="keyup[keyCode==13]" hx-target="#stock-panel" hx-swap="innerHTML" hx-include="#symbol-input" hx-indicator="#ind-stock">
                     <button hx-get="/stocks/quote" hx-target="#stock-panel" hx-swap="innerHTML" hx-include="#symbol-input" hx-indicator="#ind-stock">GO</button>
                 </div>
                 <div id="stock-panel" hx-get="/stocks/quote?symbol=AAPL" hx-trigger="load" hx-swap="innerHTML" hx-indicator="#ind-stock"></div>
             </div>
         </div>
-        <div class="panel" style="flex: 0 0 240px;">
+        <div class="panel" style="flex:0 0 240px;">
             <div class="panel-header"><span class="panel-title">&#9670; MARKET NEWS</span><span id="ind-news" class="htmx-indicator timestamp">LOADING...</span></div>
             <div class="panel-body" hx-get="/news/feed" hx-trigger="load, every 300s" hx-target="this" hx-swap="innerHTML" hx-indicator="#ind-news"></div>
         </div>
     </div>
     <div class="terminal-col">
-        <div class="panel" style="flex: 0 0 auto;">
+        <div class="panel" style="flex:0 0 auto;">
             <div class="panel-header"><span class="panel-title">&#9670; FOREX / FX RATES</span><span id="ind-forex" class="htmx-indicator timestamp">LOADING...</span></div>
             <div class="panel-body" hx-get="/forex/rates" hx-trigger="load, every 30s" hx-target="this" hx-swap="innerHTML" hx-indicator="#ind-forex"></div>
         </div>
-        <div class="panel" style="flex: 1;">
+        <div class="panel" style="flex:1;">
             <div class="panel-header"><span class="panel-title">&#9670; PORTFOLIO</span><span id="ind-portfolio" class="htmx-indicator timestamp">LOADING...</span></div>
             <div class="panel-body" id="portfolio-panel" hx-get="/portfolio" hx-trigger="load, every 30s" hx-target="this" hx-swap="innerHTML" hx-indicator="#ind-portfolio"></div>
         </div>
     </div>
 </div>
+
+<div id="view-india" class="terminal-grid" style="display:none;">
+    <div class="terminal-col" style="flex:0 0 35%;">
+        <div class="panel" style="flex:1;">
+            <div class="panel-header"><span class="panel-title">&#9670; INDIAN INDICES</span><span id="ind-india" class="htmx-indicator timestamp">LOADING...</span></div>
+            <div class="panel-body" hx-get="/india/overview" hx-trigger="load, every 30s" hx-target="this" hx-swap="innerHTML" hx-indicator="#ind-india"></div>
+        </div>
+    </div>
+    <div class="terminal-col" style="flex:1;">
+        <div class="panel" style="flex:1;">
+            <div class="panel-header"><span class="panel-title">&#9670; INDEX DETAIL &amp; FACTORS</span></div>
+            <div class="panel-body" id="india-detail" style="overflow-y:auto;">
+                <div style="color:var(--dim);padding:20px;text-align:center;">CLICK AN INDEX TO SEE DETAILS &amp; INFLUENCING FACTORS</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(tab) {
+    document.getElementById('view-global').style.display = tab==='global' ? 'grid' : 'none';
+    document.getElementById('view-india').style.display = tab==='india' ? 'grid' : 'none';
+    document.getElementById('tab-global').style.color = tab==='global' ? 'var(--amber)' : 'var(--dim)';
+    document.getElementById('tab-india').style.color = tab==='india' ? 'var(--amber)' : 'var(--dim)';
+    document.getElementById('tab-global').style.borderBottom = tab==='global' ? '2px solid var(--amber)' : 'none';
+    document.getElementById('tab-india').style.borderBottom = tab==='india' ? '2px solid var(--amber)' : 'none';
+}
+</script>
 {% endblock %}

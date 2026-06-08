@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from routers import market, stocks, forex, news, watchlist, portfolio
+from routers import market, stocks, forex, news, watchlist, portfolio, india
 from database import create_db_and_tables
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,6 +17,7 @@ app.include_router(forex.router)
 app.include_router(news.router)
 app.include_router(watchlist.router)
 app.include_router(portfolio.router)
+app.include_router(india.router)
 
 @app.on_event("startup")
 def on_startup():
