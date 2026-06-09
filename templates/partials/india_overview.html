@@ -1,16 +1,20 @@
-<table>
-    <thead><tr><th style="text-align:left;">INDEX</th><th>PRICE</th><th>CHG</th><th>CHG%</th></tr></thead>
-    <tbody>
-        {% for q in quotes %}
-        <tr style="cursor:pointer;"
-            hx-get="/india/detail?symbol={{ q.symbol }}&name={{ q.name }}"
-            hx-target="#india-detail" hx-swap="innerHTML">
-            <td style="text-align:left;"><span style="color:var(--amber);font-weight:bold;">{{ q.name }}</span></td>
-            <td>{{ "{:,.2f}".format(q.price) }}</td>
-            <td class="{{ 'up' if q.change >= 0 else 'down' }}">{{ "+" if q.change >= 0 else "" }}{{ "{:.2f}".format(q.change) }}</td>
-            <td class="{{ 'up' if q.change_pct >= 0 else 'down' }}">{{ "+" if q.change_pct >= 0 else "" }}{{ "{:.2f}".format(q.change_pct) }}%</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<div class="timestamp" style="text-align:right;margin-top:4px;">UPDATED {{ updated_at }} &bull; CLICK INDEX FOR DETAILS</div>
+<style>
+.india-cat-header{color:#ffb000;font-size:.7rem;letter-spacing:2px;padding:8px 0 4px;border-bottom:1px solid #1a1a1a;margin-top:10px}
+.india-row{display:grid;grid-template-columns:1fr 90px 70px 20px;align-items:center;padding:6px 4px;border-bottom:1px solid #111;cursor:pointer;font-size:.78rem;transition:background .15s}
+.india-row:hover{background:#0f0f0f}
+.iname{color:#ccc;font-size:.75rem}.iprice{color:#e0e0e0;text-align:right;font-family:monospace}
+.ichg{text-align:right;font-family:monospace;font-size:.72rem}.iarr{text-align:right}
+.pos{color:#00ff41}.neg{color:#ff4444}.neu{color:#888}
+</style>
+{% for cat, items in categories.items() %}
+<div class="india-cat-header">{{ cat | upper }}</div>
+{% for idx in items %}
+{% set cls = "pos" if idx.change_pct > 0 else ("neg" if idx.change_pct < 0 else "neu") %}
+<div class="india-row" hx-get="/india/detail/{{ idx.symbol }}" hx-target="#india-detail" hx-swap="innerHTML">
+  <div class="iname">{{ idx.name }}</div>
+  <div class="iprice">{% if idx.price > 0 %}{{ "%.2f"|format(idx.price) }}{% else %}—{% endif %}</div>
+  <div class="ichg {{ cls }}">{% if idx.price > 0 %}{{ "+" if idx.change_pct > 0 else "" }}{{ "%.2f"|format(idx.change_pct) }}%{% else %}N/A{% endif %}</div>
+  <div class="iarr {{ cls }}">{% if idx.price > 0 %}{{ "▲" if idx.change_pct > 0 else ("▼" if idx.change_pct < 0 else "◆") }}{% endif %}</div>
+</div>
+{% endfor %}
+{% endfor %}

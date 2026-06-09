@@ -1,52 +1,27 @@
-{% if quote.error and quote.price == 0 %}
-<div style="color:var(--red);padding:10px;">ERROR: {{ quote.error }}</div>
-{% else %}
-<div style="margin-bottom:8px;">
-    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
-        <span style="color:var(--amber);font-size:16px;font-weight:bold;">{{ name }}</span>
-        <span class="price-big" style="font-size:22px;">{{ "{:,.2f}".format(quote.price) }}</span>
-        <span class="{{ 'up' if quote.change >= 0 else 'down' }}" style="font-size:14px;">
-            {{ "+" if quote.change >= 0 else "" }}{{ "{:.2f}".format(quote.change) }}
-            ({{ "+" if quote.change_pct >= 0 else "" }}{{ "{:.2f}".format(quote.change_pct) }}%)
-        </span>
-    </div>
-    <div class="quote-grid">
-        <div class="quote-item"><label>52W HIGH</label><value class="up">{{ "{:,.2f}".format(quote.year_high) }}</value></div>
-        <div class="quote-item"><label>52W LOW</label><value class="down">{{ "{:,.2f}".format(quote.year_low) }}</value></div>
-    </div>
-</div>
-{% endif %}
-
-<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
-    <div style="color:var(--amber);font-size:10px;letter-spacing:2px;margin-bottom:6px;">KEY INFLUENCING FACTORS</div>
-    <table>
-        <thead><tr><th style="text-align:left;">FACTOR</th><th>VALUE</th><th>CHG%</th><th>IMPACT</th></tr></thead>
-        <tbody>
-            {% for f in factors %}
-            <tr>
-                <td style="text-align:left;color:var(--amber);">{{ f.name }}</td>
-                <td>{{ "{:,.2f}".format(f.price) if f.price else "N/A" }}</td>
-                <td class="{{ 'up' if f.change_pct >= 0 else 'down' }}">{{ "+" if f.change_pct >= 0 else "" }}{{ "{:.2f}".format(f.change_pct) }}%</td>
-                <td style="font-size:9px;">
-                    {% if f.name == "USD/INR" %}
-                        {% if f.change_pct > 0 %}<span class="down">BEARISH &#x25BC;</span>{% else %}<span class="up">BULLISH &#x25B2;</span>{% endif %}
-                    {% elif f.name == "BRENT CRUDE" %}
-                        {% if f.change_pct > 0 %}<span class="down">BEARISH &#x25BC;</span>{% else %}<span class="up">BULLISH &#x25B2;</span>{% endif %}
-                    {% elif f.name in ["S&P 500", "GOLD"] %}
-                        {% if f.change_pct > 0 %}<span class="up">BULLISH &#x25B2;</span>{% else %}<span class="down">BEARISH &#x25BC;</span>{% endif %}
-                    {% elif f.name == "US 10Y YIELD" %}
-                        {% if f.change_pct > 0 %}<span class="down">BEARISH &#x25BC;</span>{% else %}<span class="up">BULLISH &#x25B2;</span>{% endif %}
-                    {% else %}<span class="neutral">NEUTRAL</span>{% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div style="margin-top:8px;color:var(--dim);font-size:9px;line-height:1.8;">
-        &#x25B2; USD/INR UP = Rupee weakens = FII outflows = Bearish<br>
-        &#x25B2; CRUDE UP = Higher import bill = Inflation = Bearish<br>
-        &#x25B2; S&amp;P 500 UP = Positive global cues = Bullish<br>
-        &#x25B2; US YIELD UP = FII shift to bonds = Capital outflow = Bearish
-    </div>
-</div>
-<div class="timestamp" style="text-align:right;margin-top:4px;">UPDATED {{ updated_at }} &bull; SOURCE: NSE INDIA</div>
+{% set d = detail %}{% set cls = "pos" if d.change_pct > 0 else ("neg" if d.change_pct < 0 else "neu") %}
+<style>
+.dname{color:#ffb000;font-size:.9rem;font-weight:bold;letter-spacing:1px}
+.dprice{font-size:1.6rem;color:#e0e0e0;font-family:monospace;margin:4px 0}
+.dchg{font-size:.85rem}.drange{font-size:.7rem;color:#666;margin-top:4px}
+.ftitle{color:#ffb000;font-size:.7rem;letter-spacing:2px;margin:16px 0 6px;border-bottom:1px solid #1a1a1a;padding-bottom:4px}
+.frow{display:grid;grid-template-columns:1fr 70px 60px 70px;align-items:center;padding:5px 2px;border-bottom:1px solid #0d0d0d;font-size:.73rem}
+.fname{color:#bbb}.fprice{text-align:right;font-family:monospace;color:#ddd}
+.fchg{text-align:right;font-family:monospace}.fsent{text-align:right;font-size:.65rem;padding:1px 4px;border-radius:2px}
+.sent-BULLISH{color:#00ff41;border:1px solid #00ff4133}.sent-BEARISH{color:#ff4444;border:1px solid #ff444433}.sent-NEUTRAL{color:#888;border:1px solid #33333388}
+.iH{color:#ffb000}.iM{color:#888}.iL{color:#444}
+.pos{color:#00ff41}.neg{color:#ff4444}.neu{color:#888}
+</style>
+<div class="dname">{{ d.name }}</div>
+<div class="dprice {% if d.price == 0 %}neu{% endif %}">{% if d.price > 0 %}{{ "%.2f"|format(d.price) }}{% else %}N/A{% endif %}</div>
+<div class="dchg {{ cls }}">{% if d.price > 0 %}{{ "+" if d.change > 0 else "" }}{{ "%.2f"|format(d.change) }} ({{ "+" if d.change_pct > 0 else "" }}{{ "%.2f"|format(d.change_pct) }}%){% else %}Market closed or data unavailable{% endif %}</div>
+{% if d.year_high > 0 %}<div class="drange">52W: {{ "%.2f"|format(d.year_low) }} — {{ "%.2f"|format(d.year_high) }}</div>{% endif %}
+<div class="ftitle">KEY INFLUENCING FACTORS</div>
+<div class="frow" style="color:#555;font-size:.65rem;border-bottom:1px solid #1a1a1a"><div>FACTOR</div><div style="text-align:right">PRICE</div><div style="text-align:right">CHG%</div><div style="text-align:right">IMPACT</div></div>
+{% for f in d.factors %}{% set fc = "pos" if f.change_pct > 0 else ("neg" if f.change_pct < 0 else "neu") %}
+<div class="frow">
+  <div class="fname"><span class="i{{ f.impact[0] }}">●</span> {{ f.name }}</div>
+  <div class="fprice">{% if f.price > 0 %}{{ "%.2f"|format(f.price) }}{% else %}—{% endif %}</div>
+  <div class="fchg {{ fc }}">{% if f.price > 0 %}{{ "+" if f.change_pct > 0 else "" }}{{ "%.2f"|format(f.change_pct) }}%{% else %}—{% endif %}</div>
+  <div class="fsent sent-{{ f.sentiment }}">{{ f.sentiment }}</div>
+</div>{% endfor %}
+<div style="color:#333;font-size:.65rem;margin-top:12px">As of {{ d.as_of }} · Data via Yahoo Finance</div>
